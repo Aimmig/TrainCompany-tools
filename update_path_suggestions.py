@@ -71,7 +71,7 @@ def update_path_suggestion(task: Dict[str, Any],
                         config_ = config
                 else:
                     config_ = config
-                if force or 'pathSuggestion' not in task:
+                if force:
                     path_suggestion = get_path_suggestion(graph, stations, config=config_,
                                                           station_to_group=station_to_group)
                     if path_suggestion:
