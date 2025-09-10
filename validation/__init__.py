@@ -223,7 +223,7 @@ def validate(tc_directory: PathLike | str = '..',
                 issues_score = 1000
                 logging.warning("+{: <6} SFS mit < 150 km/h: {}".format(issues_score, print_path(path)))
                 issues += issues_score
-            elif path['maxSpeed'] < 200:
+            elif path['maxSpeed'] < 200 and enable_experimental:
                 issues_score = 5
                 logging.warning("+{: <6} SFS mit < 200 km/h: {}".format(issues_score, print_path(path)))
                 issues += issues_score
