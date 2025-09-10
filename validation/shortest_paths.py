@@ -63,7 +63,7 @@ def get_shortest_path(graph: nx.Graph,
                 if graph.has_edge(station_from, station_to):
                     path = [station_from, station_to]
                 else:
-                    path = nx.dijkstra_path(graph, station_from, station_to,
+                    length, path = nx.bidirectional_dijkstra(graph, station_from, station_to,
                                             weight=edge_weight)
             except nx.exception.NetworkXNoPath as e:
                 # We will need to try to find an alternative path
