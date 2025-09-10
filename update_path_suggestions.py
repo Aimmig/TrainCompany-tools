@@ -74,14 +74,16 @@ def update_path_suggestion(task: Dict[str, Any],
                 if force or 'pathSuggestion' not in task:
                     path_suggestion = get_path_suggestion(graph, stations, config=config_,
                                                           station_to_group=station_to_group)
-                elif fix:
+                    if path_suggestion:
+                        task['pathSuggestion'] = path_suggestion
+                elif fix and 'pathSuggestion' in task:
                     # We want to change as little as possible and be as close to the game's strategy as possible.
                     config_.distance = True
                     path_suggestion = fixed_path_suggestion(graph, stations, config=config_,
                                                             existing_path_suggestion=task['pathSuggestion'],
                                                             station_to_group=station_to_group)
-                if path_suggestion:
-                    task['pathSuggestion'] = path_suggestion
+                    if path_suggestion:
+                        task['pathSuggestion'] = path_suggestion
             except nx.exception.NetworkXNoPath as e:
                 logging.exception("Konnte keine pathSuggestion finden", exc_info=e)
         if 'pathSuggestion' in task and (
