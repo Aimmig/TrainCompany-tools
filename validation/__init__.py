@@ -173,9 +173,12 @@ def validate(tc_directory: PathLike | str = '..',
                 new_task.update(sub_task)
                 paths.append(new_task)
 
-    train_equipments = [sub_equipment['idString'] for train_equipment in train_equipment_json.data for sub_equipment in
+    train_equipments = [(sub_equipment['idString'], sub_equipment['type']) for train_equipment in train_equipment_json.data for sub_equipment in
                         tc_utils.expand_objects(train_equipment)]
-
+    gauge_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 2]
+    country_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 0]
+    other_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 1]
+    all_equipments = gauge_equipments + country_equipments + other_equipments
     seen_paths = set()
 
     for path in paths:
@@ -311,11 +314,24 @@ def validate(tc_directory: PathLike | str = '..',
         # 2.8. Check for unknown equipments
         if 'neededEquipments' in path:
             for used_equipment in path['neededEquipments']:
-                if used_equipment not in train_equipments:
+                if used_equipment not in all_equipments:
                     issues_score = 10000
                     logging.error("+{: <6} Strecke {} hat nicht existierendes Equipment: {}"
                                   .format(issues_score, print_path(path), used_equipment))
                     issues += issues_score
+            # No path should contain more than 2 country euqipments
+            if len(list(set(path['neededEquipments']) & set(country_equipments))) > 2:
+                issues_score = 20
+                logging.error("+{: <6} Strecke {} mehr als zwei Länder-Equipments: {}"
+                             .format(issues_score, print_path(path), path['neededEquipments']))
+                issues += issues_score
+            # No path should have multiple gauges
+            if len(list(set(path['neededEquipments']) & set(gauge_equipments))) > 1:
+                issues_score = 10000
+                logging.error("+{: <6} Strecke {} mehrere Spurweiten: {}"
+                             .format(issues_score, print_path(path), path['neededEquipments']))
+                issues += issues_score
+            # TO-DO: Add checks for other invalid equipment combinations
 
         # 2.9 Duplicate paths
         start_alpha, end_alpha = sorted([path["start"], path["end"]])
@@ -369,7 +385,7 @@ def validate(tc_directory: PathLike | str = '..',
     for train in train_json.data:
         if 'equipments' in train:
             for used_equipment in train['equipments']:
-                if used_equipment not in train_equipments:
+                if used_equipment not in all_equipments:
                     issues_score = 10000
                     logging.error("+{: <6} Zug {} hat nicht existierendes Equipment: {}"
                                   .format(issues_score, train['id'], used_equipment))
