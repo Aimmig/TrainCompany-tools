@@ -187,7 +187,10 @@ def validate(tc_directory: PathLike | str = '..',
             path['group'] = 0
         if 'electrified' not in path:
             path['electrified'] = True
-
+        if 'neededEquipments' not in path:
+            path['neededEquipments'] = ["DE"]
+        if set(path['neededEquipments']).isdisjoint(set(gauge_equipments)):
+            path['neededEquipments'].append('1435mm')
         # 2.0. has speed and int lenght > 1
         if 'maxSpeed' not in path:
             issues_score = 10000
