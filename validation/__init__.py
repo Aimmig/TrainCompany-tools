@@ -433,7 +433,7 @@ def validate(tc_directory: PathLike | str = '..',
                     issues += issues_score
             # 5.1.1 All tasks which at least 2 stations should have a valid path
             # Experimental because this is very time consuming and propably ok to run on demand
-            if not None in task['stations'] and enable_experimental:
+            if not None in task['stations'] and len(task['stations']) > 1 and enable_experimental:
                 try:
                     config = PathSuggestionConfig(distance=True)
                     path = get_shortest_path(graph=graph, stations=task['stations'], config=config, log=False)
