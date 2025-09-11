@@ -437,8 +437,20 @@ def validate(tc_directory: PathLike | str = '..',
             # Experimental because this is very time consuming and propably ok to run on demand
             if not None in task['stations'] and len(task['stations']) > 1 and enable_experimental:
                 try:
+                    path_equipments = []
                     config = PathSuggestionConfig(distance=True)
-                    path = get_shortest_path(graph=graph, stations=task['stations'], config=config, log=False)
+                    current_path = get_shortest_path(graph=graph, stations=task['stations'], config=config, log=False)
+                    for path in paths:
+                        for segment_start, segment_end in nx.utils.pairwise(current_path):
+                            if (path['start'] == segment_start and path['end'] == segment_end) or (path['start'] == segment_end and path['end'] == segment_start):
+                                #if segment_start == "XLRD" and segment_end == "XFLY" or segment_end == "XLRD" and segment_start == "XFLY":
+                                path_equipments.append(path['neededEquipments'])
+                                continue
+                    path_equipments = set(sum(path_equipments, []))
+                    if len(list(path_equipments & set(gauge_equipments))) > 1:
+                        issues_score = 5
+                        logging.error("+{: <6} Auftrag benötigt mehrere Spurweiten: {}".format(issues_score, task['stations'], path_equipments))
+                        issues += issues_score
                 except nx.exception.NetworkXNoPath as e:
                     # Error if no path could not be found
                     issues_score = 10000
