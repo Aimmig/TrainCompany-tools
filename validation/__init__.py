@@ -427,6 +427,7 @@ def validate(tc_directory: PathLike | str = '..',
 
     for task in tasks:
         # 5.1. All stations exist
+        current_path = None
         if 'stations' in task:
             for station in task['stations']:
                 if station is not None and station not in selected_codes:
@@ -435,7 +436,7 @@ def validate(tc_directory: PathLike | str = '..',
                     issues += issues_score
             # 5.1.1 All tasks which at least 2 stations should have a valid path
             # Experimental because this is very time consuming and propably ok to run on demand
-            if not None in task['stations'] and len(task['stations']) > 1 and enable_experimental:
+            if enable_experimental:
                 try:
                     path_equipments = []
                     config = PathSuggestionConfig(distance=True)
@@ -449,7 +450,7 @@ def validate(tc_directory: PathLike | str = '..',
                     path_equipments = set(sum(path_equipments, []))
                     if len(list(path_equipments & set(gauge_equipments))) > 1:
                         issues_score = 5
-                        logging.error("+{: <6} Auftrag benötigt mehrere Spurweiten: {}".format(issues_score, task['stations'], path_equipments))
+                        logging.warning("+{: <6} Auftrag {} benötigt mehrere Spurweiten: {}".format(issues_score, task['stations'], path_equipments))
                         issues += issues_score
                 except nx.exception.NetworkXNoPath as e:
                     # Error if no path could not be found
