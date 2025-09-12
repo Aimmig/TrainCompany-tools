@@ -176,7 +176,7 @@ def validate(tc_directory: PathLike | str = '..',
     train_equipments = [(sub_equipment['idString'], sub_equipment['type']) for train_equipment in train_equipment_json.data for sub_equipment in
                         tc_utils.expand_objects(train_equipment)]
     gauge_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 2]
-    country_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 0]
+    country_equipments = list(countries.keys())
     other_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 1]
     all_equipments = gauge_equipments + country_equipments + other_equipments
     seen_paths = set()
@@ -190,7 +190,7 @@ def validate(tc_directory: PathLike | str = '..',
         if not 'neededEquipments' in path:
             path['neededEquipments'] = []
         if set(path['neededEquipments']).isdisjoint(set(country_equipments)):
-            path['neededEquipments'].append('DE')
+            path['neededEquipments'].append(germany.iso_3166)
         if set(path['neededEquipments']).isdisjoint(set(gauge_equipments)):
             path['neededEquipments'].append('1435mm')
         # 2.0. has speed and int lenght > 1
