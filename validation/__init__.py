@@ -175,13 +175,20 @@ def validate(tc_directory: PathLike | str = '..',
                 new_task.update(sub_task)
                 paths.append(new_task)
 
-    train_equipments = [(sub_equipment['idString'], sub_equipment['type']) for train_equipment in train_equipment_json.data for sub_equipment in
+    train_equipments = [sub_equipment['idString'] for train_equipment in train_equipment_json.data for sub_equipment in
                         tc_utils.expand_objects(train_equipment)]
     gauge_equipments = list(gauges.keys())
     country_equipments = list(countries.keys())
     other_equipments = list(equipments.keys())
     all_equipments = gauge_equipments + country_equipments + other_equipments
     seen_paths = set()
+
+    # Validate, if equipment is defined
+    for eq in train_equipments:
+        if eq not in all_equipments:
+            issues_score = 10000
+            logging.error("+{: <6} Unbekanntes Equipment: {}".format(issues_score, eq))
+            issues += issues_score
 
     for path in paths:
         # Add default values if necessary
