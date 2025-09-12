@@ -156,6 +156,8 @@ countries: Dict[str, Country] = {country.iso_3166: country for country in (
                 accusative="die VR China"
             )),
     Country(iso_3166='CU', uic=40, name="Kuba"),
+    # Kosovo is not in IUC. 43 is not used officially
+    Country(iso_3166='XK', uic=43, name="Kosovo"),
     Country(iso_3166='AL', uic=41, name="Albanien"),
     Country(iso_3166='JP', uic=42, name="Japan"),
     Country(iso_3166='AZ', uic=57, name="Aserbaidschan"),
@@ -207,7 +209,7 @@ countries: Dict[str, Country] = {country.iso_3166: country for country in (
 # Unused:
 # 11 12 15 16 17 18 19
 # 34 35 36 37 38 39
-# 43 45 46 47 48
+# 45 46 47 48
 # 63 64
 # 89
 
