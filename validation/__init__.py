@@ -328,7 +328,7 @@ def validate(tc_directory: PathLike | str = '..',
         # 2.8. Check for unknown equipments
         if 'neededEquipments' in path:
             for used_equipment in path['neededEquipments']:
-                if used_equipment not in all_equipments:
+                if used_equipment not in train_equipments:
                     issues_score = 10000
                     logging.error("+{: <6} Strecke {} hat nicht existierendes Equipment: {}"
                                   .format(issues_score, print_path(path), used_equipment))
@@ -399,7 +399,7 @@ def validate(tc_directory: PathLike | str = '..',
     for train in train_json.data:
         if 'equipments' in train:
             for used_equipment in train['equipments']:
-                if used_equipment not in all_equipments:
+                if used_equipment not in train_equipments:
                     issues_score = 10000
                     logging.error("+{: <6} Zug {} hat nicht existierendes Equipment: {}"
                                   .format(issues_score, train['id'], used_equipment))
