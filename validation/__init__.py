@@ -16,6 +16,7 @@ from structures.station import iter_stations_by_codes_reverse
 from tc_utils import TcFile
 from validation.graph import build_tc_graph
 from structures.country import country_for_code, countries, germany
+from structures.gauge import gauges
 from validation.shortest_paths import get_shortest_path
 from cli_utils import format_list_double_quotes
 from validation.graph import flatten_objects
@@ -175,7 +176,7 @@ def validate(tc_directory: PathLike | str = '..',
 
     train_equipments = [(sub_equipment['idString'], sub_equipment['type']) for train_equipment in train_equipment_json.data for sub_equipment in
                         tc_utils.expand_objects(train_equipment)]
-    gauge_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 2]
+    gauge_equipments = list(gauges.keys())
     country_equipments = list(countries.keys())
     other_equipments = [equipment[0] for equipment in train_equipments if equipment[1] == 1]
     all_equipments = gauge_equipments + country_equipments + other_equipments
