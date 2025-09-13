@@ -177,10 +177,10 @@ def validate(tc_directory: PathLike | str = '..',
 
     train_equipments = [sub_equipment['idString'] for train_equipment in train_equipment_json.data for sub_equipment in
                         tc_utils.expand_objects(train_equipment)]
-    gauge_equipments = list(gauges.keys())
-    country_equipments = list(countries.keys())
-    other_equipments = list(equipments.keys())
-    all_equipments = gauge_equipments + country_equipments + other_equipments
+    gauge_equipments = set(gauges.keys())
+    country_equipments = set(countries.keys())
+    other_equipments = set(equipments.keys())
+    all_equipments = gauge_equipments | country_equipments | other_equipments
     seen_paths = set()
 
     # Validate, if equipment is defined
@@ -198,9 +198,9 @@ def validate(tc_directory: PathLike | str = '..',
             path['electrified'] = True
         if not 'neededEquipments' in path:
             path['neededEquipments'] = []
-        if set(path['neededEquipments']).isdisjoint(set(country_equipments)):
+        if set(path['neededEquipments']).isdisjoint(country_equipments):
             path['neededEquipments'].append(germany.iso_3166)
-        if set(path['neededEquipments']).isdisjoint(set(gauge_equipments)):
+        if set(path['neededEquipments']).isdisjoint(gauge_equipments):
             path['neededEquipments'].append('1435mm')
         # 2.0. has speed and int lenght > 1
         if 'maxSpeed' not in path:
@@ -334,13 +334,13 @@ def validate(tc_directory: PathLike | str = '..',
                                   .format(issues_score, print_path(path), used_equipment))
                     issues += issues_score
             # No path should contain more than 2 country euqipments
-            if len(list(set(path['neededEquipments']) & set(country_equipments))) > 2:
+            if len(set(path['neededEquipments']).intersection(country_equipments)) > 2:
                 issues_score = 20
                 logging.error("+{: <6} Strecke {} mehr als zwei Länder-Equipments: {}"
                              .format(issues_score, print_path(path), path['neededEquipments']))
                 issues += issues_score
             # No path should have multiple gauges
-            if len(list(set(path['neededEquipments']) & set(gauge_equipments))) > 1:
+            if len(set(path['neededEquipments']).intersection(gauge_equipments)) > 1:
                 issues_score = 10000
                 logging.error("+{: <6} Strecke {} mehrere Spurweiten: {}"
                              .format(issues_score, print_path(path), path['neededEquipments']))
@@ -447,17 +447,16 @@ def validate(tc_directory: PathLike | str = '..',
             # Experimental because this is very time consuming and propably ok to run on demand
             if enable_experimental:
                 try:
-                    path_equipments = []
+                    path_equipments = set()
                     config = PathSuggestionConfig(distance=True)
                     current_path = get_shortest_path(graph=graph, stations=task['stations'], config=config, log=False)
-                    for path in paths:
-                        for segment_start, segment_end in nx.utils.pairwise(current_path):
-                            if (path['start'] == segment_start and path['end'] == segment_end) or (path['start'] == segment_end and path['end'] == segment_start):
-                                #if segment_start == "XLRD" and segment_end == "XFLY" or segment_end == "XLRD" and segment_start == "XFLY":
-                                path_equipments.append(path['neededEquipments'])
-                                continue
-                    path_equipments = set(sum(path_equipments, []))
-                    if len(list(path_equipments & set(gauge_equipments))) > 1:
+                    if current_path:
+                        for path in paths:
+                            for segment_start, segment_end in nx.utils.pairwise(current_path):
+                                if (path['start'] == segment_start and path['end'] == segment_end) or (path['start'] == segment_end and path['end'] == segment_start):
+                                    path_equipments.add(equipment for equipment in path['neededEquipments'])
+                                    continue
+                    if len(path_equipments.intersection(gauge_equipments)) > 1:
                         issues_score = 5
                         logging.warning("+{: <6} Auftrag {} benötigt mehrere Spurweiten: {}".format(issues_score, task['stations'], path_equipments))
                         issues += issues_score
