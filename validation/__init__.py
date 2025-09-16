@@ -303,7 +303,12 @@ def validate(tc_directory: PathLike | str = '..',
             issues += issues_score
         if path['end'] not in selected_codes:
             issues_score = 10000
-            logging.error("+{: <6} Nicht existierender End-Bahnhof: {}".format(issues_score, path['start']))
+            logging.error("+{: <6} Nicht existierender End-Bahnhof: {}".format(issues_score, path['end']))
+            issues += issues_score
+
+        if path['start'] == path['end']:
+            issues_score = 10000
+            logging.error("+{: <6} Pfad mit identischem start und end: {}".format(issues_score, path['start']))
             issues += issues_score
 
         # 2.6. SFS-name for non-SFS
