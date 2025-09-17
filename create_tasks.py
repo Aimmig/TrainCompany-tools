@@ -51,7 +51,8 @@ def create_tasks(Gattung: Type,
         stations=stations_task,
         line_name=name,
         name_pronouns=pronouns,
-        graph=graph
+        graph=graph,
+        path_suggestion_config=path_suggestion_config
     ) for stations_task in stations]
     for task in tasks:
         task.add_sfs_description(graph=graph)
