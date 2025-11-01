@@ -85,6 +85,7 @@ countries: Dict[str, Country] = {country.iso_3166: country for country in (
     Country(db_ril100='ZI', iso_3166='IE', uic=60, name="Irland"),
     # FIXME: Bosnia and Serbia have partially the same RIL100 code
     Country(db_ril100='XJ', iso_3166='RS', uic=72, name="Serbien"),
+    Country(iso_3166='NIR', uic=35, name="Nordirland"),
     Country(db_ril100='XK', iso_3166='GB', uic=70, name="Vereinigtes Königreich", _tld='uk',
             _name_forms=Pronouns(
                 nominative="das Vereinigte Königreich",
@@ -208,7 +209,7 @@ countries: Dict[str, Country] = {country.iso_3166: country for country in (
 )}
 # Unused:
 # 11 12 15 16 17 18 19
-# 34 35 36 37 38 39
+# 34 36 37 38 39
 # 45 46 47 48
 # 63 64
 # 89
